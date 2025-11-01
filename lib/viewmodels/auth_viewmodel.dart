@@ -6,7 +6,7 @@ class AuthViewModel with ChangeNotifier {
   bool _isAuthenticated = false;
   bool get isAuthenticated => _isAuthenticated;
 
-  final DatabaseHelper _db = DatabaseHelper();
+  final DatabaseHelper _db = DatabaseHelper.instance;
 
   Future<void> login(String username, String password) async {
     if (username == 'Demo' && password == '1234') {

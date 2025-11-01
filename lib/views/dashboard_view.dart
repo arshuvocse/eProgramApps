@@ -4,16 +4,38 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/auth_viewmodel.dart';
 
-class DashboardView extends StatelessWidget {
+class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
+
+  @override
+  State<DashboardView> createState() => _DashboardViewState();
+}
+
+class _DashboardViewState extends State<DashboardView> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  static const List<Widget> _widgetOptions = <Widget>[
+    DashboardGrid(),
+    ApprovalPage(),
+    ReportsPage(),
+    SettingsPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
 
     return Scaffold(
+      backgroundColor: Colors.teal.shade700,
       appBar: AppBar(
-        backgroundColor: Colors.teal.shade700,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Text(
           'Dashboard',
           style: GoogleFonts.lato(
@@ -30,42 +52,83 @@ class DashboardView extends StatelessWidget {
           ),
         ],
       ),
-      body: GridView.count(
-        crossAxisCount: 2,
-        padding: const EdgeInsets.all(16.0),
-        children: <Widget>[
-          _buildDashboardItem(context, 'Punch In', '08:30 AM', Icons.timer),
-          _buildDashboardItem(context, 'Punch Out', '05:30 PM', Icons.timer_off),
-          _buildDashboardItem(context, 'Attendance', '', Icons.calendar_today),
-          _buildDashboardItem(context, 'Providers', '', Icons.people),
-          _buildDashboardItem(context, 'Tour Plan', '', Icons.map),
-          _buildDashboardItem(context, 'Checklist', '', Icons.checklist),
-          _buildDashboardItem(context, 'Providers', '', Icons.list_alt),
-          _buildDashboardItem(context, 'Training', '', Icons.school),
-        ],
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BottomNavigationBar(
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                activeIcon: Icon(Icons.home),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.check_circle_outline),
+                activeIcon: Icon(Icons.check_circle),
+                label: 'Approval',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.bar_chart_outlined),
+                activeIcon: Icon(Icons.bar_chart),
+                label: 'Reports',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.settings_outlined),
+                activeIcon: Icon(Icons.settings),
+                label: 'Settings',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+            selectedItemColor: Colors.teal.shade700,
+            unselectedItemColor: Colors.grey,
+            showUnselectedLabels: true,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.approval),
-            label: 'Approval',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Reports',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        selectedItemColor: Colors.teal.shade700,
-        unselectedItemColor: Colors.grey,
+        ),
       ),
+    );
+  }
+}
+
+class DashboardGrid extends StatelessWidget {
+  const DashboardGrid({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 2,
+      padding: const EdgeInsets.all(16.0),
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+      children: <Widget>[
+        _buildDashboardItem(context, 'Punch In', '08:30 AM', Icons.timer),
+        _buildDashboardItem(context, 'Punch Out', '05:30 PM', Icons.timer_off),
+        _buildDashboardItem(context, 'Attendance', '', Icons.calendar_today),
+        _buildDashboardItem(context, 'Providers', '', Icons.people),
+        _buildDashboardItem(context, 'Tour Plan', '', Icons.map),
+        _buildDashboardItem(context, 'Checklist', '', Icons.checklist),
+        _buildDashboardItem(context, 'Providers', '', Icons.list_alt),
+        _buildDashboardItem(context, 'Training', '', Icons.school),
+      ],
     );
   }
 
@@ -78,6 +141,7 @@ class DashboardView extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {},
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -87,6 +151,7 @@ class DashboardView extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 title,
+                textAlign: TextAlign.center,
                 style: GoogleFonts.lato(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -103,6 +168,48 @@ class DashboardView extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ApprovalPage extends StatelessWidget {
+  const ApprovalPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        'Approval Page',
+        style: GoogleFonts.lato(fontSize: 24, color: Colors.white),
+      ),
+    );
+  }
+}
+
+class ReportsPage extends StatelessWidget {
+  const ReportsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        'Reports Page',
+        style: GoogleFonts.lato(fontSize: 24, color: Colors.white),
+      ),
+    );
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        'Settings Page',
+        style: GoogleFonts.lato(fontSize: 24, color: Colors.white),
       ),
     );
   }

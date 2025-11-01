@@ -5,6 +5,7 @@ import 'viewmodels/auth_viewmodel.dart';
 import 'router.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

@@ -1,6 +1,7 @@
 
 import 'package:go_router/go_router.dart';
 import 'package:myapp/views/dashboard_view.dart';
+import 'package:myapp/views/data_sync_view.dart';
 import 'package:myapp/views/login_view.dart';
 import 'package:myapp/views/splash_view.dart';
 import 'viewmodels/auth_viewmodel.dart';
@@ -23,7 +24,7 @@ class AppRouter {
         builder: (context, state) => const LoginView(),
         redirect: (context, state) {
           if (authViewModel.isAuthenticated) {
-            return '/dashboard';
+            return '/data-sync';
           }
           return null;
         },
@@ -31,6 +32,16 @@ class AppRouter {
       GoRoute(
         path: '/dashboard',
         builder: (context, state) => const DashboardView(),
+        redirect: (context, state) {
+          if (!authViewModel.isAuthenticated) {
+            return '/login';
+          }
+          return null;
+        },
+      ),
+      GoRoute(
+        path: '/data-sync',
+        builder: (context, state) => const DataSyncView(),
         redirect: (context, state) {
           if (!authViewModel.isAuthenticated) {
             return '/login';

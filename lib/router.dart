@@ -1,5 +1,4 @@
 
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myapp/views/dashboard_view.dart';
 import 'package:myapp/views/data_sync_view.dart';

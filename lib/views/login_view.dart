@@ -11,7 +11,7 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscureText = true;
 
@@ -54,11 +54,11 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 const SizedBox(height: 32),
                 TextField(
-                  controller: _emailController,
+                  controller: _usernameController,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.email_outlined, color: Colors.white70),
-                    labelText: 'Email',
+                    prefixIcon: const Icon(Icons.person_outline, color: Colors.white70),
+                    labelText: 'User ID',
                     labelStyle: const TextStyle(color: Colors.white70),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.white.withAlpha((255 * 0.5).round())),
@@ -100,7 +100,7 @@ class _LoginViewState extends State<LoginView> {
                 ElevatedButton(
                   onPressed: () {
                     authViewModel.login(
-                      _emailController.text,
+                      _usernameController.text,
                       _passwordController.text,
                     );
                   },
@@ -131,7 +131,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     TextButton(
                       onPressed: () {
-                        // TODO: Navigate to signup screen
+
                       },
                       child: const Text(
                         'Sign Up',

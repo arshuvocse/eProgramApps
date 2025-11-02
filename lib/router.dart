@@ -1,4 +1,5 @@
 
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myapp/views/dashboard_view.dart';
 import 'package:myapp/views/data_sync_view.dart';
@@ -22,33 +23,31 @@ class AppRouter {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginView(),
-        redirect: (context, state) {
-          if (authViewModel.isAuthenticated) {
-            return '/data-sync';
-          }
-          return null;
-        },
       ),
       GoRoute(
         path: '/dashboard',
         builder: (context, state) => const DashboardView(),
-        redirect: (context, state) {
-          if (!authViewModel.isAuthenticated) {
-            return '/login';
-          }
-          return null;
-        },
       ),
       GoRoute(
         path: '/data-sync',
         builder: (context, state) => const DataSyncView(),
-        redirect: (context, state) {
-          if (!authViewModel.isAuthenticated) {
-            return '/login';
-          }
-          return null;
-        },
       ),
     ],
+    redirect: (context, state) {
+      if (!authViewModel.isAuthCheckComplete) {
+        return null; // Stay on splash while checking
+      }
+
+      final isLoggingIn = state.matchedLocation == '/login';
+      if (!authViewModel.isAuthenticated && !isLoggingIn) {
+        return '/login';
+      }
+
+      if (authViewModel.isAuthenticated && (state.matchedLocation == '/login' || state.matchedLocation == '/')) {
+        return '/dashboard';
+      }
+
+      return null; // No redirect needed
+    },
   );
 }

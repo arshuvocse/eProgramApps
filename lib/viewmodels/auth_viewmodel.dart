@@ -4,7 +4,10 @@ import '../helpers/database_helper.dart';
 
 class AuthViewModel with ChangeNotifier {
   bool _isAuthenticated = false;
+  bool _isAuthCheckComplete = false;
+
   bool get isAuthenticated => _isAuthenticated;
+  bool get isAuthCheckComplete => _isAuthCheckComplete;
 
   final DatabaseHelper _db = DatabaseHelper.instance;
 
@@ -21,13 +24,10 @@ class AuthViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> tryAutoLogin() async {
+  Future<void> tryAutoLogin() async {
     final user = await _db.getUser();
-    if (user != null) {
-      _isAuthenticated = true;
-      notifyListeners();
-      return true;
-    }
-    return false;
+    _isAuthenticated = user != null;
+    _isAuthCheckComplete = true;
+    notifyListeners();
   }
 }

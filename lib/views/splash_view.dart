@@ -14,24 +14,34 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
-  }
-
-  Future<void> _checkLoginStatus() async {
-    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
-    final isLoggedIn = await authViewModel.tryAutoLogin();
-    if (isLoggedIn) {
-      // Already navigated by the router
-    } else {
-      // Stay on the splash screen, the router will handle the rest
-    }
+    // The navigation is now handled by the router's redirect logic
+    // We just need to trigger the auth check
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AuthViewModel>(context, listen: false).tryAutoLogin();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      backgroundColor: const Color(0xFF1E232C),
       body: Center(
-        child: CircularProgressIndicator(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'e-Program',
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+            ),
+            const SizedBox(height: 20),
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          ],
+        ),
       ),
     );
   }

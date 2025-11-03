@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'helpers/database_helper.dart';
-import 'viewmodels/auth_viewmodel.dart';
 import 'viewmodels/item_viewmodel.dart';
 import 'router.dart';
 
@@ -11,20 +10,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseHelper.instance.database; // Initialize the database
 
-  // Create dependencies beforehand
-  final authViewModel = AuthViewModel();
-  final appRouter = AppRouter(authViewModel: authViewModel);
+  final appRouter = AppRouter();
 
-  runApp(MyApp(authViewModel: authViewModel, appRouter: appRouter));
+  runApp(MyApp(appRouter: appRouter));
 }
 
 class MyApp extends StatelessWidget {
-  final AuthViewModel authViewModel;
   final AppRouter appRouter;
 
   const MyApp({
     super.key,
-    required this.authViewModel,
     required this.appRouter,
   });
 
@@ -32,7 +27,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: authViewModel),
         ChangeNotifierProvider(create: (context) => ItemViewModel()),
       ],
       child: MaterialApp.router(

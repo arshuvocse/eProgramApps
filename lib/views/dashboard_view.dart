@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../viewmodels/auth_viewmodel.dart';
+import 'settings_view.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
@@ -24,33 +24,40 @@ class _DashboardViewState extends State<DashboardView> {
     DashboardGrid(),
     ApprovalPage(),
     ReportsPage(),
-    SettingsPage(),
+    SettingsView(), // Display SettingsView as a tab
   ];
 
   @override
   Widget build(BuildContext context) {
-    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+    // Use a list of titles that corresponds to the tabs
+    final List<String> appBarTitles = [
+      'Dashboard',
+      'Approval',
+      'Reports',
+      'Settings', 
+    ];
 
     return Scaffold(
-      backgroundColor: Colors.teal.shade700,
+      backgroundColor: _selectedIndex == 3 ? Colors.grey.shade100 : Colors.teal.shade700,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          'Dashboard',
+          appBarTitles[_selectedIndex], // Title changes based on selected tab
           style: GoogleFonts.lato(
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: _selectedIndex == 3 ? Colors.black : Colors.white,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
+            icon: Icon(Icons.logout, color: _selectedIndex == 3 ? Colors.black : Colors.white),
             onPressed: () {
-              authViewModel.logout();
+              context.go('/login');
             },
           ),
         ],
+        iconTheme: IconThemeData(color: _selectedIndex == 3 ? Colors.black : Colors.white),
       ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
@@ -195,20 +202,6 @@ class ReportsPage extends StatelessWidget {
     return Center(
       child: Text(
         'Reports Page',
-        style: GoogleFonts.lato(fontSize: 24, color: Colors.white),
-      ),
-    );
-  }
-}
-
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'Settings Page',
         style: GoogleFonts.lato(fontSize: 24, color: Colors.white),
       ),
     );

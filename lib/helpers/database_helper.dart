@@ -38,6 +38,13 @@ class DatabaseHelper {
     await db.execute(
       'CREATE TABLE User(id INTEGER PRIMARY KEY, username TEXT, password TEXT)',
     );
+
+    await db.execute('''
+    CREATE TABLE divisions (
+      DivisionId INTEGER PRIMARY KEY,
+      DivisionName TEXT NOT NULL
+    )
+    ''');
   }
 
   Future<int> saveUser(String username, String password) async {

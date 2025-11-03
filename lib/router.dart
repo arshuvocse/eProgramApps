@@ -1,18 +1,13 @@
 
 import 'package:go_router/go_router.dart';
 import 'package:myapp/views/dashboard_view.dart';
-import 'package:myapp/views/data_sync_view.dart';
+import 'package:myapp/views/sync_data_view.dart';
 import 'package:myapp/views/login_view.dart';
 import 'package:myapp/views/splash_view.dart';
-import 'viewmodels/auth_viewmodel.dart';
+import 'package:myapp/views/settings_view.dart';
 
 class AppRouter {
-  final AuthViewModel authViewModel;
-
-  AppRouter({required this.authViewModel});
-
   late final router = GoRouter(
-    refreshListenable: authViewModel,
     initialLocation: '/',
     routes: [
       GoRoute(
@@ -28,25 +23,20 @@ class AppRouter {
         builder: (context, state) => const DashboardView(),
       ),
       GoRoute(
-        path: '/data-sync',
-        builder: (context, state) => const DataSyncView(),
+        path: '/sync-data',
+        builder: (context, state) => const SyncDataView(),
+      ),
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) => const SettingsView(),
       ),
     ],
-    redirect: (context, state) {
-      if (!authViewModel.isAuthCheckComplete) {
-        return null; // Stay on splash while checking
-      }
-
-      final isLoggingIn = state.matchedLocation == '/login';
-      if (!authViewModel.isAuthenticated && !isLoggingIn) {
+    redirect: (context, state) async {
+      if (state.matchedLocation == '/') {
+        await Future.delayed(const Duration(seconds: 2));
         return '/login';
       }
-
-      if (authViewModel.isAuthenticated && (state.matchedLocation == '/login' || state.matchedLocation == '/')) {
-        return '/dashboard';
-      }
-
-      return null; // No redirect needed
+      return null;
     },
   );
 }

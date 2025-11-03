@@ -2,15 +2,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:sqflite/sqflite.dart';
-import '../config/api_endpoints.dart';
-import '../config/app_config.dart';
 import '../helpers/database_helper.dart';
 import '../models/item_model.dart';
 
 class ItemRepository {
+  
+  static const String _baseUrl = 'https://api.example.com';
+
   Future<List<Item>> getItems() async {
     try {
-      final response = await http.get(Uri.parse(AppConfig.baseUrl + ApiEndpoints.items));
+      final response = await http.get(Uri.parse('$_baseUrl/items'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<Item> items = (data['rows'] as List)

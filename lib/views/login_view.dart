@@ -1,7 +1,8 @@
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../viewmodels/auth_viewmodel.dart';
+import '../services/api_service.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -14,11 +15,45 @@ class _LoginViewState extends State<LoginView> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscureText = true;
+  bool _isLoading = false;
+  final ApiService _apiService = ApiService();
+
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await _apiService.login(
+        _usernameController.text,
+        _passwordController.text,
+      );
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        context.go('/sync-data');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login Failed: ${response.body}')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final authViewModel = Provider.of<AuthViewModel>(context);
-
     return Scaffold(
       backgroundColor: const Color(0xFF1E232C),
       body: Center(
@@ -97,30 +132,27 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                ElevatedButton(
-                  onPressed: () {
-                    authViewModel.login(
-                      _usernameController.text,
-                      _passwordController.text,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      side: const BorderSide(color: Colors.white),
-                    ),
-                  ),
-                  child: Text(
-                    'LOGIN',
-                    style: GoogleFonts.lato(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ElevatedButton(
+                        onPressed: _login,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            side: const BorderSide(color: Colors.white),
+                          ),
+                        ),
+                        child: Text(
+                          'LOGIN',
+                          style: GoogleFonts.lato(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -130,9 +162,7 @@ class _LoginViewState extends State<LoginView> {
                       style: TextStyle(color: Colors.white70),
                     ),
                     TextButton(
-                      onPressed: () {
-
-                      },
+                      onPressed: () {},
                       child: const Text(
                         'Sign Up',
                         style: TextStyle(

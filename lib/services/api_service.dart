@@ -1,9 +1,9 @@
-
 import 'package:http/http.dart' as http;
 import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
 import '../config/app_config.dart';
 import '../config/api_endpoints.dart';
+import '../models/item_model.dart';
 
 class ApiService {
   Future<Map<String, String>> _getDeviceDetails() async {
@@ -47,8 +47,24 @@ class ApiService {
       ...deviceDetails,
     };
 
-    final uri = Uri.parse('${AppConfig.baseUrl}${ApiEndpoints.login}').replace(queryParameters: queryParams);
+    final uri = Uri.parse('${AppConfig.baseUrl}${ApiEndpoints.login}')
+        .replace(queryParameters: queryParams);
 
     return await http.post(uri);
+  }
+
+  Future<List<String>> fetchDivisions() async {
+    // This is a placeholder. Replace with actual API call.
+    return Future.value(['Division A', 'Division B']);
+  }
+
+  Future<List<Item>> fetchItems(String division) async {
+    // This is a placeholder. Replace with actual API call.
+    await Future.delayed(const Duration(seconds: 1)); // Simulate network latency
+    final items = [
+      Item(id: 1, name: 'Item 1', category: 'Category 1', price: 10.0, inStock: true),
+      Item(id: 2, name: 'Item 2', category: 'Category 2', price: 20.0, inStock: false),
+    ];
+    return items.where((item) => item.category == division).toList();
   }
 }

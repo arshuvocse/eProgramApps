@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/helpers/database_helper.dart';
-import 'package:myapp/models/user_model.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:myapp/config/app_config.dart';
-import 'package:myapp/config/api_endpoints.dart';
-
+import 'package:myapp/services/auth_service.dart';
 import 'package:myapp/views/dashboard_view.dart';
+import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -32,10 +28,12 @@ class _LoginViewState extends State<LoginView> {
         child: Column(
           children: [
             TextField(
+              key: const Key('username_field'),
               controller: _usernameController,
               decoration: const InputDecoration(labelText: 'Username'),
             ),
             TextField(
+              key: const Key('password_field'),
               controller: _passwordController,
               decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
@@ -48,6 +46,7 @@ class _LoginViewState extends State<LoginView> {
             _isLoading
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
+                    key: const Key('login_button'),
                     onPressed: _login,
                     child: const Text('Login'),
                   ),
@@ -63,23 +62,24 @@ class _LoginViewState extends State<LoginView> {
     });
 
     try {
-      final response = await http.post(
-        Uri.parse(
-            '${AppConfig.baseUrl}${ApiEndpoints.login}?UserName=${_usernameController.text}&password=${_passwordController.text}&Imei=${_imeiController.text}&DeviceToken=51193&Device=51193&AppVersion=51193&OS=51193&OS_Version=51193'),
+      final authService = Provider.of<AuthService>(context, listen: false);
+      final dbHelper = Provider.of<DatabaseHelper>(context, listen: false);
+
+      final user = await authService.login(
+        _usernameController.text,
+        _passwordController.text,
+        _imeiController.text,
       );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final user = User.fromJson(data);
-        await DatabaseHelper().insertUser(user);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const DashboardView()),
-        );
-      } else {
-        _showErrorDialog('Login failed. Please try again.');
-      }
+      await dbHelper.insertUser(user);
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const DashboardView()),
+      );
     } catch (e) {
+      if (!mounted) return;
       _showErrorDialog('An error occurred: $e');
     }
 

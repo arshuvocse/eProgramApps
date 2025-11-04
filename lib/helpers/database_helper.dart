@@ -1,69 +1,77 @@
-
 import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:myapp/models/user_model.dart';
 
 class DatabaseHelper {
-  static final DatabaseHelper instance = DatabaseHelper._init();
-
+  static final DatabaseHelper _instance = DatabaseHelper._internal();
+  factory DatabaseHelper() => _instance;
   static Database? _database;
 
-  DatabaseHelper._init();
+  DatabaseHelper._internal();
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-
-    _database = await _initDB('main.db');
+    _database = await _initDatabase();
     return _database!;
   }
 
-  Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
-
-    return await openDatabase(path, version: 1, onCreate: _createDB);
-  }
-
-  Future _createDB(Database db, int version) async {
-    await db.execute('''
-    CREATE TABLE items (
-      id INTEGER PRIMARY KEY,
-      name TEXT NOT NULL,
-      category TEXT NOT NULL,
-      price REAL NOT NULL,
-      in_stock INTEGER NOT NULL
-    )
-    ''');
-
-    await db.execute(
-      'CREATE TABLE User(id INTEGER PRIMARY KEY, username TEXT, password TEXT)',
+  Future<Database> _initDatabase() async {
+    final documentsDirectory = await getApplicationDocumentsDirectory();
+    final path = join(documentsDirectory.path, 'app.db');
+    return await openDatabase(
+      path,
+      version: 1,
+      onCreate: _onCreate,
     );
+  }
 
+  Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
-    CREATE TABLE divisions (
-      DivisionId INTEGER PRIMARY KEY,
-      DivisionName TEXT NOT NULL
-    )
+      CREATE TABLE User(
+        UserId INTEGER PRIMARY KEY,
+        EmpInfoId INTEGER,
+        UserName TEXT,
+        EmpMasterCode TEXT,
+        UserType TEXT,
+        LoginName TEXT,
+        Password TEXT,
+        UserEmail TEXT,
+        ContactInfo TEXT,
+        UserCo TEXT,
+        RoleTypeId INTEGER,
+        IsApprove INTEGER,
+        IsForward INTEGER,
+        RoleType TEXT,
+        IsImeiMatched INTEGER,
+        VersionName TEXT,
+        ShiftStartTime TEXT,
+        ShiftEndTime TEXT,
+        IsTrackEnable INTEGER,
+        EmpRole TEXT,
+        DesigName TEXT,
+        TwoDeviceMsg TEXT
+      )
     ''');
   }
 
-  Future<int> saveUser(String username, String password) async {
-    final dbClient = await database;
-    await dbClient.delete('User'); // Clear previous user
-    return await dbClient.insert('User', {'username': username, 'password': password});
+  Future<void> insertUser(User user) async {
+    final db = await database;
+    await db.insert(
+      'User',
+      user.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
-  Future<Map<String, dynamic>?> getUser() async {
-    final dbClient = await database;
-    final result = await dbClient.query('User', limit: 1);
-    if (result.isNotEmpty) {
-      return result.first;
+  Future<User?> getUser() async {
+    final db = await database;
+    final maps = await db.query('User');
+    if (maps.isNotEmpty) {
+      return User.fromJson(maps.first);
+    } else {
+      return null;
     }
-    return null;
-  }
-
-  Future<int> deleteUser() async {
-    final dbClient = await database;
-    return await dbClient.delete('User');
   }
 }
